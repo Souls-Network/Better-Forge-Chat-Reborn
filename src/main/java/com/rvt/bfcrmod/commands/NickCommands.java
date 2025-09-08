@@ -76,44 +76,43 @@ public class NickCommands {
 				.executes(NickCommands::whoisCommand)));
 	}
 
-	private static Player lookupPlayer(String user) {
+	private static ServerPlayer lookupPlayer(String user) {
 		MinecraftServer serv = ServerLifecycleHooks.getCurrentServer();
 		if(serv != null) {
 			user = user.trim().toLowerCase();
 			List<ServerPlayer> players = serv.getPlayerList().getPlayers();
 			for(ServerPlayer player : players) {
-				Player prof = player;
-                String uname = prof.getName().getContents().toString().toLowerCase();
-                if(user.equals(uname)) return prof;
-                String nname = BetterForgeChat.instance.nicknameProvider.getPlayerNickname(prof).trim().toLowerCase();
-                if(user.equals(TextFormatter.removeTextFormatting(nname))) return prof;
+                String uname = player.getName().getContents().toString().toLowerCase();
+                if(user.equals(uname)) return player;
+                String nname = BetterForgeChat.instance.nicknameProvider.getPlayerNickname(player).trim().toLowerCase();
+                if(user.equals(TextFormatter.removeTextFormatting(nname))) return player;
             }
 		}
 		return null;
 	}
 	private static int whoisCommand(CommandContext<CommandSourceStack> ctx) {
 		String user = StringArgumentType.getString(ctx, "displayname");
-		Player prof = lookupPlayer(user);
+		ServerPlayer prof = lookupPlayer(user);
 		if(prof != null) {
-			ctx.getSource().sendSuccess(()->TextFormatter.stringToFormattedText("&eFound a name matching " + user + ": \"" + prof.getName() + "\"\n&eUUID: " + prof.getId() + "&r"), false);
+			ctx.getSource().sendSuccess(()->TextFormatter.stringToFormattedText(prof, "&eFound a name matching " + user + ": \"" + prof.getName() + "\"\n&eUUID: " + prof.getId() + "&r"), false);
 			return 1;
 		} else {
-			ctx.getSource().sendFailure(TextFormatter.stringToFormattedText("&cUnknown username/nickname!&r"));
+			ctx.getSource().sendFailure(TextFormatter.stringToFormattedText(null, "&cUnknown username/nickname!&r"));
 			return 0;
 		}
 	}
 	private static int assignNickname(CommandContext<CommandSourceStack> ctx, UUID uuid, String nick) {
 		if(nick == null) {
-			ctx.getSource().sendSuccess(()->TextFormatter.stringToFormattedText("&eNickname reset!&r"), false);
+			ctx.getSource().sendSuccess(()->TextFormatter.stringToFormattedText(null, "&eNickname reset!&r"), false);
 			PlayerData.setNickname(uuid, null);
 			return 1;
 		} else {
 			if(nick.length() >= minNicknameLength && nick.length() <= maxNicknameLength) {
-				ctx.getSource().sendSuccess(()->TextFormatter.stringToFormattedText("&eNickname set to \"" + nick + "&r&e\"!&r"), false);
+				ctx.getSource().sendSuccess(()->TextFormatter.stringToFormattedText(null, "&eNickname set to \"" + nick + "&r&e\"!&r"), false);
 				PlayerData.setNickname(uuid, nick);
 				return 1;
 			} else {
-				ctx.getSource().sendFailure(TextFormatter.stringToFormattedText("&cNickname must be between 1 and 50 characters!&r"));
+				ctx.getSource().sendFailure(TextFormatter.stringToFormattedText(null, "&cNickname must be between 1 and 50 characters!&r"));
 				return 0;
 			}
 		}
@@ -134,11 +133,11 @@ public class NickCommands {
 			if(prof != null) {
 				return assignNickname(ctx, prof.getUUID() , nick);
 			} else {
-				ctx.getSource().sendFailure(TextFormatter.stringToFormattedText("&cUnknown player: \"" + user + "\"!&r"));
+				ctx.getSource().sendFailure(TextFormatter.stringToFormattedText(null, "&cUnknown player: \"" + user + "\"!&r"));
 				return 0;
 			}
 		}
-		ctx.getSource().sendFailure(TextFormatter.stringToFormattedText("&cUnknown error!&r"));
+		ctx.getSource().sendFailure(TextFormatter.stringToFormattedText(null, "&cUnknown error!&r"));
 		return 0;
 	}
 }

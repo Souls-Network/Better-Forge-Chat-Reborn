@@ -64,23 +64,21 @@ public class ChatEventHandler implements IReloadable {
     public static void onServerChat(ServerChatEvent e) {
 		if(!loaded) return; // Just do nothing until everything's ready to go!
     	ServerPlayer player = e.getPlayer();
-        Player profile = player;
-    	UUID uuid = profile.getUUID();
-		if(e == null || player == null) return;
+        UUID uuid = player.getUUID();
         String msg = e.getMessage().getString();
-		if(msg == null || (msg).isEmpty()) return;
+		if(msg.isEmpty()) return;
 		String tstamp = timestampFormat == null ? "" : timestampFormat.format(new Date());
-		String name = BetterForgeChatUtilities.getRawPreferredPlayerName(profile);
+		String name = BetterForgeChatUtilities.getRawPreferredPlayerName(player);
 		BetterForgeChat.LOGGER.debug("global message format: {}",chatMessageFormat);
 		String fmat = chatMessageFormat.replace("$time", tstamp).replace("$name", name);
 		BetterForgeChat.LOGGER.debug("formatted: {}",fmat);
-		MutableComponent beforeMsg = TextFormatter.stringToFormattedText(fmat.substring(0, fmat.indexOf("$msg")));
+		MutableComponent beforeMsg = TextFormatter.stringToFormattedText(player, fmat.substring(0, fmat.indexOf("$msg")));
 		BetterForgeChat.LOGGER.debug("before message: {}",beforeMsg.toString());
-		MutableComponent afterMsg = TextFormatter.stringToFormattedText(fmat.substring(fmat.indexOf("$msg") + 4));
+		MutableComponent afterMsg = TextFormatter.stringToFormattedText(player, fmat.substring(fmat.indexOf("$msg") + 4));
 		BetterForgeChat.LOGGER.debug("after message: {}",afterMsg.toString());
 		boolean enableColor = PermissionsHandler.playerHasPermission(uuid, PermissionsHandler.coloredChatNode);
 		boolean enableStyle = PermissionsHandler.playerHasPermission(uuid, PermissionsHandler.styledChatNode);
-		
+
 		// Create an error message if the player isn't allowed to use styles/colors
 		String emsg = "";
 		if(!enableColor && TextFormatter.messageContainsColorsOrStyles(msg, true))
@@ -101,21 +99,22 @@ public class ChatEventHandler implements IReloadable {
 		}
 
 		// Start generating the main TextComponent
-		MutableComponent msgComp = TextFormatter.stringToFormattedText(msg, enableColor, enableStyle);
+		MutableComponent msgComp = TextFormatter.stringToFormattedText(player, msg, enableColor, enableStyle);
 
 		// Append the hover and click event crap
 		Style sty = getHoverClickEventStyle(e.getMessage());
 		MutableComponent ecmp = Component.empty();
 		if(sty != null && sty.getHoverEvent() != null)
 			ecmp.setStyle(sty);
-		e.setCanceled(true);
-		
-		MutableComponent newMessage = beforeMsg.append(msgComp.append(afterMsg));
-		
-		player.server.execute(() -> {
-			BetterForgeChat.LOGGER.info("[CHAT] "+newMessage.getString());
-			ServerMessageEvent.broadcastMessage(player.level(), newMessage);
-		});
-		
+//		e.setCanceled(true);
+
+		MutableComponent newMessage = msgComp.append(afterMsg);
+
+        e.setMessage(newMessage);
+//		player.server.execute(() -> {
+//			BetterForgeChat.LOGGER.info("[CHAT] "+newMessage.getString());
+//			ServerMessageEvent.broadcastMessage(player.level(), newMessage);
+//		});
+
     }
 }

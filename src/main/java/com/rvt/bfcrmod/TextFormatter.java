@@ -3,9 +3,11 @@ package com.rvt.bfcrmod;
 
 import com.rvt.bfcrmod.config.ConfigHandler;
 import com.rvt.bfcrmod.events.ChatEventHandler;
+import com.rvt.bfcrmod.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 public final class TextFormatter {
 	public static final String RESET_ALL_FORMAT = "&r";
@@ -33,54 +35,60 @@ public final class TextFormatter {
 	public static final String COLOR_YELLOW =       "&e";
 	public static final String COLOR_WHITE =        "&f";
 	
-	public static MutableComponent stringToFormattedText(String msg) {
-		return stringToFormattedText(msg, true, true);
+	public static MutableComponent stringToFormattedText(ServerPlayer player, String msg) {
+		return stringToFormattedText(player, msg, true, true);
 	}
-	public static MutableComponent stringToFormattedText(String msg, boolean enableColors, boolean enableStyles) {
-		String DefaultColor = "WHITE";
-		ChatFormatting curColor= ChatFormatting.WHITE;
-		DefaultColor = ChatEventHandler.getChatMessageColor();
-		BetterForgeChat.LOGGER.debug("default Color: {}",DefaultColor);
-		if (!DefaultColor.isEmpty())curColor = ChatFormatting.getByName(DefaultColor);
-		if (curColor==null){
-			curColor=ChatFormatting.WHITE;
-			BetterForgeChat.LOGGER.error("Chat color in Config is invalid, please check BFCR config file");
-			BetterForgeChat.LOGGER.error("Resetting Global chat message color to White");
-		}
-		BetterForgeChat.LOGGER.debug("final chat color: {}",curColor.getName());
-		if(msg == null) return null;
-		MutableComponent newMsg = Component.empty();
-		boolean nextIsStyle = false;
-		String curStr = "";
-		byte curStyle = 0;
-		for(int i = 0; i < ((CharSequence) msg).length(); i++) {
-			char c = ((CharSequence) msg).charAt(i);
-			if(c == '&') {
-				if(nextIsStyle) {
-					nextIsStyle = false;
-					curStr += "&";
-				} else nextIsStyle = true;
-			} else if(nextIsStyle) {
-				MutableComponent tmp = BitwiseStyling.makeEncapsulatingTextComponent(curStr, enableStyles ? curStyle : 0);
-				tmp.withStyle(curColor);
-				newMsg.append(tmp);
-				if(enableColors)
-					curColor = getColor(c, curColor);
-				curStr = "";
-
-				if(c == 'r') {
-					curColor = ChatFormatting.getByName(DefaultColor);
-					curStyle = 0;
-				} else curStyle |= BitwiseStyling.getStyleBit(c);
-				nextIsStyle = false;
-			} else curStr += c;
-		}
-		if(!curStr.isEmpty()) {
-			MutableComponent tmp = BitwiseStyling.makeEncapsulatingTextComponent(curStr, enableStyles ? curStyle : 0);
-			tmp.withStyle(curColor);
-			newMsg.append(tmp);
-		}
-		return newMsg;
+	public static MutableComponent stringToFormattedText(ServerPlayer player, String msg, boolean enableColors, boolean enableStyles) {
+////        System.out.println("Pre Text: " + text);
+//
+////        var msg = Utils.parseText(player, text);
+//
+////        System.out.println("Post Text: " + msg);
+//
+//		String DefaultColor = "WHITE";
+//		ChatFormatting curColor= ChatFormatting.WHITE;
+//		DefaultColor = ChatEventHandler.getChatMessageColor();
+//		BetterForgeChat.LOGGER.debug("default Color: {}",DefaultColor);
+//		if (!DefaultColor.isEmpty())curColor = ChatFormatting.getByName(DefaultColor);
+//		if (curColor==null){
+//			curColor=ChatFormatting.WHITE;
+//			BetterForgeChat.LOGGER.error("Chat color in Config is invalid, please check BFCR config file");
+//			BetterForgeChat.LOGGER.error("Resetting Global chat message color to White");
+//		}
+//		BetterForgeChat.LOGGER.debug("final chat color: {}",curColor.getName());
+//		if(msg == null) return null;
+//		MutableComponent newMsg = Component.empty();
+//		boolean nextIsStyle = false;
+//		String curStr = "";
+//		byte curStyle = 0;
+//		for(int i = 0; i < ((CharSequence) msg).length(); i++) {
+//			char c = ((CharSequence) msg).charAt(i);
+//			if(c == '&') {
+//				if(nextIsStyle) {
+//					nextIsStyle = false;
+//					curStr += "&";
+//				} else nextIsStyle = true;
+//			} else if(nextIsStyle) {
+//				MutableComponent tmp = BitwiseStyling.makeEncapsulatingTextComponent(curStr, enableStyles ? curStyle : 0);
+//				tmp.withStyle(curColor);
+//				newMsg.append(tmp);
+//				if(enableColors)
+//					curColor = getColor(c, curColor);
+//				curStr = "";
+//
+//				if(c == 'r') {
+//					curColor = ChatFormatting.getByName(DefaultColor);
+//					curStyle = 0;
+//				} else curStyle |= BitwiseStyling.getStyleBit(c);
+//				nextIsStyle = false;
+//			} else curStr += c;
+//		}
+//		if(!curStr.isEmpty()) {
+//			MutableComponent tmp = BitwiseStyling.makeEncapsulatingTextComponent(curStr, enableStyles ? curStyle : 0);
+//			tmp.withStyle(curColor);
+//			newMsg.append(tmp);
+//		}
+		return Utils.parseTextAsComponent(player, LegacyToMiniMessage.convert(msg)).copy();
 	}
 	public static String removeTextFormatting(String msg) {
 		if(msg == null) return null;

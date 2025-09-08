@@ -33,7 +33,7 @@ public class BfcCommands {
 		return checkPermission(c.getSource(), node);
 	}
 	protected static int failNoPermission(CommandContext<CommandSourceStack> ctx) {
-		ctx.getSource().sendFailure(TextFormatter.stringToFormattedText(TextFormatter.COLOR_RED + "You don't have permission to run this command" + TextFormatter.RESET_ALL_FORMAT));
+		ctx.getSource().sendFailure(TextFormatter.stringToFormattedText(null, TextFormatter.COLOR_RED + "You don't have permission to run this command" + TextFormatter.RESET_ALL_FORMAT));
 		return 0;
 	}
 	
@@ -69,7 +69,7 @@ public class BfcCommands {
                         if(hasNickProv) nickProvName = " (via " + nickProvName + ")";
 						String finalMetaProvName = metaProvName;
 						String finalNickProvName = nickProvName;
-						ctx.getSource().sendSuccess(() ->TextFormatter.stringToFormattedText(
+						ctx.getSource().sendSuccess(() ->TextFormatter.stringToFormattedText(null,
                                 BetterForgeChat.CHAT_ID_STR + "\n&eMod ID: &d" + BetterForgeChat.MODID + "    &r&eMod version: &d" + BetterForgeChat.VERSION + " (forge)&r\n\n"
                                         + (hasMetaProv ? "&a&lWITH" : "&c&lWITHOUT") + "&r&e metadata integration" + finalMetaProvName + "&r\n"
                                         + (hasNickProv ? "&a&lWITH" : "&c&lWITHOUT") + "&r&e nickname integration" + finalNickProvName + "&r\n"), false);
@@ -77,7 +77,7 @@ public class BfcCommands {
                     } else return failNoPermission(ctx);
                 }
                 case "test" -> {
-                    ctx.getSource().sendSuccess(() ->TextFormatter.stringToFormattedText(
+                    ctx.getSource().sendSuccess(() ->TextFormatter.stringToFormattedText(null,
                             BetterForgeChat.CHAT_ID_STR
                                     + "&eColors & Styling internal debug test&r\n"
                                             + "Normal &lBold&r &nUnderline&r &oItalic&r &mStrikthrough&r &kObfuscated&r &rReset\n"
@@ -91,7 +91,7 @@ public class BfcCommands {
 	}
 	public static int colorCommand(CommandContext<CommandSourceStack> ctx) {
 		ctx.getSource().sendSuccess(() ->
-				TextFormatter.stringToFormattedText(
+				TextFormatter.stringToFormattedText(null,
 				BetterForgeChat.CHAT_ID_STR + TextFormatter.colorString()), false);
 		return 1;
 	}

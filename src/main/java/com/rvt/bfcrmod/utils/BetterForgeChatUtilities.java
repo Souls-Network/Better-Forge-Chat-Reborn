@@ -6,6 +6,7 @@ import com.rvt.bfcrmod.TextFormatter;
 import com.rvt.bfcrmod.config.ConfigHandler;
 
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class BetterForgeChatUtilities {
@@ -16,11 +17,11 @@ public class BetterForgeChatUtilities {
 		BetterForgeChat.LOGGER.debug("getting player name format: {}",playerNameFormat);
 	}
 	
-	public static String getRawPreferredPlayerName(Player player) {
+	public static String getRawPreferredPlayerName(ServerPlayer player) {
 		BetterForgeChat.LOGGER.debug("raw preferredPlayername: {}",getRawPreferredPlayerName(player, true, true));
 		return getRawPreferredPlayerName(player, true, true);
 	}
-	public static String getRawPreferredPlayerName(Player player, boolean enableNickname, boolean enableMetadata) {
+	public static String getRawPreferredPlayerName(ServerPlayer player, boolean enableNickname, boolean enableMetadata) {
 		String name = BetterForgeChat.instance.nicknameProvider != null && enableNickname ? BetterForgeChat.instance.nicknameProvider.getPlayerChatName(player) : player.getName().getString();
 		if(name == null) name = player.getName().getString(); /* No nickname (or null-nickname) provided */
 		String pfx = "", sfx = "";
@@ -41,10 +42,10 @@ public class BetterForgeChatUtilities {
 			return playerNameFormatted;
 		}
 	}
-	public static MutableComponent getFormattedPlayerName(Player player) {
-		return TextFormatter.stringToFormattedText(getRawPreferredPlayerName(player));
+	public static MutableComponent getFormattedPlayerName(ServerPlayer player) {
+		return TextFormatter.stringToFormattedText(player, getRawPreferredPlayerName(player));
 	}
-	public static MutableComponent getFormattedPlayerName(Player player, boolean enableNickname, boolean enableMetadata) {
-		return TextFormatter.stringToFormattedText(getRawPreferredPlayerName(player, enableNickname, enableMetadata));
+	public static MutableComponent getFormattedPlayerName(ServerPlayer player, boolean enableNickname, boolean enableMetadata) {
+		return TextFormatter.stringToFormattedText(player, getRawPreferredPlayerName(player, enableNickname, enableMetadata));
 	}
 }
